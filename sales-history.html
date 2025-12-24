@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - SwiftPOS</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/design-inline.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>⚡ SwiftPOS</h2>
+                <p>Administration</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="admin.html">
+                            <span class="icon">📊</span>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li id="posNavItem" style="display: none;">
+                        <a href="pos.html">
+                            <span class="icon">⚡</span>
+                            <span>Point de vente</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="accounts.html">
+                            <span class="icon">👥</span>
+                            <span>Comptes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="categories.html">
+                            <span class="icon">🏷️</span>
+                            <span>Catégories</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="products.html">
+                            <span class="icon">📦</span>
+                            <span>Produits</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="barcodes.html">
+                            <span class="icon">📋</span>
+                            <span>Codes-Barres</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="promotions.html">
+                            <span class="icon">🎯</span>
+                            <span>Promotions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="sales-history.html" class="active">
+                            <span class="icon">💰</span>
+                            <span>Ventes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reports.html">
+                            <span class="icon">📈</span>
+                            <span>Rapports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="design.html">
+                            <span class="icon">🎨</span>
+                            <span>Personnalisation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="settings.html">
+                            <span class="icon">⚙️</span>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-user">
+                <div class="sidebar-user-info">
+                    <p class="name" id="userName">Admin</p>
+                    <p class="email" id="userEmail">admin@swiftpos.com</p>
+                </div>
+                <button class="btn btn-secondary" id="logoutBtn" style="width: 100%;">
+                    Déconnexion
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main-header">
+                <h1>Historique des Ventes</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="filterBtn">
+                        <span>🔍</span> Filtrer
+                    </button>
+                    <button class="btn btn-primary" id="exportBtn">
+                        <span>📥</span> Exporter
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Section Ventes -->
+            <section id="dashboard" class="content-section active">
+                <div class="sales-table-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Toutes les Commandes</h2>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>Numéro de Commande</th>
+                                        <th>Date</th>
+                                        <th>Vendeur</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--color-text-tertiary);">
+                                            <div class="loading"></div>
+                                            <p style="margin-top: 1rem; font-size: 0.9375rem;">Chargement des commandes...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        </main>
+    </div>
+    
+    <!-- Modal Filtre -->
+    <div class="modal-overlay" id="filterModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Filtrer les ventes</h2>
+                <button class="modal-close" id="closeFilterModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="dateFrom">Date de début</label>
+                    <input type="date" id="dateFrom" name="dateFrom">
+                </div>
+                <div class="input-group">
+                    <label for="dateTo">Date de fin</label>
+                    <input type="date" id="dateTo" name="dateTo">
+                </div>
+                <div class="input-group">
+                    <label for="searchUser">Rechercher par vendeur</label>
+                    <input type="text" id="searchUser" name="searchUser" placeholder="Nom du vendeur...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="resetFilters">Réinitialiser</button>
+                <button class="btn btn-primary" id="applyFilters">Appliquer les filtres</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Détails Commande -->
+    <div class="modal-overlay" id="saleDetailsModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="modalSaleTitle">Détails de la Commande</h2>
+                <button class="modal-close" id="closeSaleDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalSaleBody">
+                <!-- Le contenu sera injecté par JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeSaleDetailsBtn">Fermer</button>
+                <button class="btn btn-primary" id="exportSalePdfBtn">
+                    <span>📄</span> Exporter en PDF
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Export -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Exporter les ventes</h2>
+                <button class="modal-close" id="closeExportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Période</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="period" value="week" checked>
+                            <span>Cette semaine</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="period" value="month">
+                            <span>Ce mois</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="period" value="all">
+                            <span>Toutes les ventes</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Format</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="format" value="pdf" checked>
+                            <span>PDF</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="format" value="csv">
+                            <span>CSV</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="format" value="json">
+                            <span>JSON</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelExport">Annuler</button>
+                <button class="btn btn-primary" id="confirmExport">Exporter</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module" src="js/design-loader.js"></script>
+    <script type="module" src="js/sales.js"></script>
+</body>
+</html>
+

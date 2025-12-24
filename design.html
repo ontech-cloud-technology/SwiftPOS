@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnalisation - SwiftPOS</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/design-inline.js"></script>
+    <style>
+        .design-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .design-header {
+            margin-bottom: 2rem;
+        }
+        
+        .design-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .design-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--color-gray-200);
+            padding-bottom: 1rem;
+        }
+        
+        .design-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            transition: all var(--transition-base);
+        }
+        
+        .design-tab:hover {
+            background: var(--color-gray-100);
+            color: var(--color-text-primary);
+        }
+        
+        .design-tab.active {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .design-section {
+            display: none;
+        }
+        
+        .design-section.active {
+            display: block;
+        }
+        
+        .design-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .design-card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+        }
+        
+        .design-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--color-text-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="url"],
+        .form-group input[type="file"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: 0.95rem;
+            transition: all var(--transition-base);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-50);
+        }
+        
+        .form-group input[type="color"] {
+            width: 100%;
+            height: 50px;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+        }
+        
+        .form-group input[type="range"] {
+            width: 100%;
+        }
+        
+        .form-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .range-value {
+            display: inline-block;
+            margin-left: 0.5rem;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        
+        .preview-box {
+            width: 100%;
+            height: 100px;
+            border: 2px dashed var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5rem;
+            background: var(--color-gray-50);
+        }
+        
+        .color-preview {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius-md);
+            border: 2px solid var(--color-gray-300);
+            cursor: pointer;
+        }
+        
+        .save-section {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1.5rem;
+            border-top: 2px solid var(--color-gray-200);
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .icon-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .icon-option {
+            padding: 0.75rem;
+            border: 2px solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-size: 1.5rem;
+        }
+        
+        .icon-option:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-50);
+        }
+        
+        .icon-option.selected {
+            border-color: var(--color-primary);
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .font-preview {
+            padding: 1rem;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-md);
+            margin-top: 0.5rem;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 id="appNameDisplay">⚡ SwiftPOS</h2>
+                <p>Personnalisation</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="admin.html">
+                            <span class="icon">📊</span>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li id="posNavItem" style="display: none;">
+                        <a href="pos.html">
+                            <span class="icon">⚡</span>
+                            <span>Point de vente</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="accounts.html">
+                            <span class="icon">👥</span>
+                            <span>Comptes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="categories.html">
+                            <span class="icon">🏷️</span>
+                            <span>Catégories</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="products.html">
+                            <span class="icon">📦</span>
+                            <span>Produits</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="barcodes.html">
+                            <span class="icon">📋</span>
+                            <span>Codes-Barres</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="promotions.html">
+                            <span class="icon">🎯</span>
+                            <span>Promotions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="sales-history.html">
+                            <span class="icon">💰</span>
+                            <span>Ventes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reports.html">
+                            <span class="icon">📈</span>
+                            <span>Rapports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="design.html" class="active">
+                            <span class="icon">🎨</span>
+                            <span>Personnalisation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="settings.html">
+                            <span class="icon">⚙️</span>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-user">
+                <div class="sidebar-user-info">
+                    <p class="name" id="userName">Admin</p>
+                    <p class="email" id="userEmail">admin@swiftpos.com</p>
+                </div>
+                <button class="btn btn-secondary" id="logoutBtn" style="width: 100%;">
+                    Déconnexion
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main-header">
+                <div>
+                    <h1>🎨 Personnalisation de l'application</h1>
+                    <p class="header-subtitle">Personnalisez l'apparence et le comportement de toute l'application</p>
+                </div>
+            </div>
+            
+            <div class="design-container">
+                <!-- Tabs -->
+                <div class="design-tabs">
+                    <button class="design-tab active" data-section="brand">🏢 Identité</button>
+                    <button class="design-tab" data-section="colors">🎨 Couleurs</button>
+                    <button class="design-tab" data-section="typography">📝 Typographie</button>
+                    <button class="design-tab" data-section="layout">📐 Layout</button>
+                    <button class="design-tab" data-section="components">🧩 Composants</button>
+                    <button class="design-tab" data-section="animations">✨ Animations</button>
+                    <button class="design-tab" data-section="icons">🔣 Icônes</button>
+                    <button class="design-tab" data-section="images">🖼️ Images</button>
+                    <button class="design-tab" data-section="texts">📄 Textes</button>
+                    <button class="design-tab" data-section="advanced">⚙️ Avancé</button>
+                </div>
+                
+                <!-- Brand Identity Section -->
+                <section id="brand" class="design-section active">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Nom de l'application</h3>
+                            <div class="form-group">
+                                <label>Nom de la caisse / Application</label>
+                                <input type="text" id="appName" placeholder="SwiftPOS">
+                            </div>
+                            <div class="form-group">
+                                <label>Tagline / Slogan</label>
+                                <input type="text" id="appTagline" placeholder="Point de Vente Premium">
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="appDescription" rows="3" placeholder="Description de l'application"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Logo</h3>
+                            <div class="form-group">
+                                <label>Logo principal (URL ou fichier)</label>
+                                <input type="url" id="logoUrl" placeholder="https://example.com/logo.png">
+                                <input type="file" id="logoFile" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>Taille du logo (px)</label>
+                                <input type="range" id="logoSize" min="20" max="200" value="40">
+                                <span class="range-value" id="logoSizeValue">40px</span>
+                            </div>
+                            <div class="preview-box" id="logoPreview">
+                                <span>Prévisualisation du logo</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Favicon</h3>
+                            <div class="form-group">
+                                <label>Favicon (URL ou fichier)</label>
+                                <input type="url" id="faviconUrl" placeholder="https://example.com/favicon.ico">
+                                <input type="file" id="faviconFile" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>Icône de l'application</label>
+                                <input type="url" id="appIconUrl" placeholder="https://example.com/app-icon.png">
+                                <input type="file" id="appIconFile" accept="image/*">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Informations de contact</h3>
+                            <div class="form-group">
+                                <label>Nom de l'entreprise</label>
+                                <input type="text" id="companyName" placeholder="Nom de l'entreprise">
+                            </div>
+                            <div class="form-group">
+                                <label>Adresse</label>
+                                <textarea id="companyAddress" rows="2" placeholder="Adresse complète"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Téléphone</label>
+                                <input type="text" id="companyPhone" placeholder="+1 234 567 8900">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="text" id="companyEmail" placeholder="contact@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Site web</label>
+                                <input type="url" id="companyWebsite" placeholder="https://example.com">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Colors Section -->
+                <section id="colors" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Couleur primaire</h3>
+                            <div class="form-group">
+                                <label>Couleur principale</label>
+                                <input type="color" id="colorPrimary" value="#3b82f6">
+                            </div>
+                            <div class="form-group">
+                                <label>Couleur primaire claire</label>
+                                <input type="color" id="colorPrimaryLight" value="#60a5fa">
+                            </div>
+                            <div class="form-group">
+                                <label>Couleur primaire foncée</label>
+                                <input type="color" id="colorPrimaryDark" value="#2563eb">
+                            </div>
+                            <div class="color-preview">
+                                <div class="color-swatch" id="previewPrimary"></div>
+                                <div class="color-swatch" id="previewPrimaryLight"></div>
+                                <div class="color-swatch" id="previewPrimaryDark"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Couleur secondaire</h3>
+                            <div class="form-group">
+                                <label>Couleur secondaire</label>
+                                <input type="color" id="colorSecondary" value="#10b981">
+                            </div>
+                            <div class="form-group">
+                                <label>Couleur secondaire claire</label>
+                                <input type="color" id="colorSecondaryLight" value="#34d399">
+                            </div>
+                            <div class="form-group">
+                                <label>Couleur d'accent</label>
+                                <input type="color" id="colorAccent" value="#d4af37">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Couleurs de fond</h3>
+                            <div class="form-group">
+                                <label>Fond principal</label>
+                                <input type="color" id="colorBgPrimary" value="#ffffff">
+                            </div>
+                            <div class="form-group">
+                                <label>Fond secondaire</label>
+                                <input type="color" id="colorBgSecondary" value="#f5f6f8">
+                            </div>
+                            <div class="form-group">
+                                <label>Fond sidebar</label>
+                                <input type="color" id="colorBgSidebar" value="#1f2937">
+                            </div>
+                            <div class="form-group">
+                                <label>Fond cartes</label>
+                                <input type="color" id="colorBgCard" value="#ffffff">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Couleurs de texte</h3>
+                            <div class="form-group">
+                                <label>Texte principal</label>
+                                <input type="color" id="colorTextPrimary" value="#2e2e2e">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte secondaire</label>
+                                <input type="color" id="colorTextSecondary" value="#6b7280">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte sidebar</label>
+                                <input type="color" id="colorTextSidebar" value="#e5e7eb">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte sur fond sombre</label>
+                                <input type="color" id="colorTextWhite" value="#ffffff">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Couleurs système</h3>
+                            <div class="form-group">
+                                <label>Succès</label>
+                                <input type="color" id="colorSuccess" value="#10b981">
+                            </div>
+                            <div class="form-group">
+                                <label>Erreur</label>
+                                <input type="color" id="colorError" value="#ef4444">
+                            </div>
+                            <div class="form-group">
+                                <label>Avertissement</label>
+                                <input type="color" id="colorWarning" value="#f59e0b">
+                            </div>
+                            <div class="form-group">
+                                <label>Information</label>
+                                <input type="color" id="colorInfo" value="#3b82f6">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Couleurs de bordure</h3>
+                            <div class="form-group">
+                                <label>Couleur de bordure principale</label>
+                                <input type="color" id="colorBorder" value="#e5e7eb">
+                            </div>
+                            <div class="form-group">
+                                <label>Couleur de bordure secondaire</label>
+                                <input type="color" id="colorBorderSecondary" value="#d1d5db">
+                            </div>
+                            <div class="form-group">
+                                <label>Opacité des bordures (%)</label>
+                                <input type="range" id="borderOpacity" min="0" max="100" value="100">
+                                <span class="range-value" id="borderOpacityValue">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Typography Section -->
+                <section id="typography" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Police principale</h3>
+                            <div class="form-group">
+                                <label>Famille de police</label>
+                                <select id="fontFamily">
+                                    <option value="Inter, system-ui, sans-serif">Inter (Recommandé)</option>
+                                    <option value="Roboto, sans-serif">Roboto</option>
+                                    <option value="Open Sans, sans-serif">Open Sans</option>
+                                    <option value="Lato, sans-serif">Lato</option>
+                                    <option value="Montserrat, sans-serif">Montserrat</option>
+                                    <option value="Poppins, sans-serif">Poppins</option>
+                                    <option value="Nunito, sans-serif">Nunito</option>
+                                    <option value="Raleway, sans-serif">Raleway</option>
+                                    <option value="Ubuntu, sans-serif">Ubuntu</option>
+                                    <option value="Arial, sans-serif">Arial</option>
+                                    <option value="Helvetica, sans-serif">Helvetica</option>
+                                    <option value="Georgia, serif">Georgia (Serif)</option>
+                                    <option value="Times New Roman, serif">Times New Roman (Serif)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Police personnalisée (URL Google Fonts)</label>
+                                <input type="url" id="customFontUrl" placeholder="https://fonts.googleapis.com/css2?family=...">
+                            </div>
+                            <div class="font-preview" id="fontPreview">
+                                <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">Titre de prévisualisation</p>
+                                <p>Texte de prévisualisation avec la police sélectionnée. Cette police sera utilisée dans toute l'application.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Tailles de police</h3>
+                            <div class="form-group">
+                                <label>Taille de base (px)</label>
+                                <input type="range" id="fontSizeBase" min="12" max="20" value="16">
+                                <span class="range-value" id="fontSizeBaseValue">16px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille H1 (px)</label>
+                                <input type="range" id="fontSizeH1" min="24" max="48" value="32">
+                                <span class="range-value" id="fontSizeH1Value">32px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille H2 (px)</label>
+                                <input type="range" id="fontSizeH2" min="20" max="40" value="24">
+                                <span class="range-value" id="fontSizeH2Value">24px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille H3 (px)</label>
+                                <input type="range" id="fontSizeH3" min="18" max="32" value="20">
+                                <span class="range-value" id="fontSizeH3Value">20px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Hauteur de ligne</label>
+                                <input type="range" id="lineHeight" min="1" max="2" step="0.1" value="1.6">
+                                <span class="range-value" id="lineHeightValue">1.6</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Espacement des lettres</h3>
+                            <div class="form-group">
+                                <label>Letter-spacing normal (px)</label>
+                                <input type="range" id="letterSpacing" min="-2" max="5" step="0.1" value="0">
+                                <span class="range-value" id="letterSpacingValue">0px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Letter-spacing titres (px)</label>
+                                <input type="range" id="letterSpacingHeading" min="-2" max="5" step="0.1" value="-0.5">
+                                <span class="range-value" id="letterSpacingHeadingValue">-0.5px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Poids de police</h3>
+                            <div class="form-group">
+                                <label>Poids normal</label>
+                                <select id="fontWeightNormal">
+                                    <option value="300">Light (300)</option>
+                                    <option value="400" selected>Regular (400)</option>
+                                    <option value="500">Medium (500)</option>
+                                    <option value="600">Semi-bold (600)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Poids des titres</label>
+                                <select id="fontWeightHeading">
+                                    <option value="500">Medium (500)</option>
+                                    <option value="600">Semi-bold (600)</option>
+                                    <option value="700" selected>Bold (700)</option>
+                                    <option value="800">Extra-bold (800)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Layout Section -->
+                <section id="layout" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Sidebar</h3>
+                            <div class="form-group">
+                                <label>Largeur de la sidebar (px)</label>
+                                <input type="range" id="sidebarWidth" min="200" max="400" value="280">
+                                <span class="range-value" id="sidebarWidthValue">280px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Position de la sidebar</label>
+                                <select id="sidebarPosition">
+                                    <option value="left">Gauche</option>
+                                    <option value="right">Droite</option>
+                                </select>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="sidebarCollapsible">
+                                <label for="sidebarCollapsible">Sidebar rétractable</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="sidebarFixed">
+                                <label for="sidebarFixed">Sidebar fixe (scroll)</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Opacité du fond sidebar (%)</label>
+                                <input type="range" id="sidebarOpacity" min="0" max="100" value="100">
+                                <span class="range-value" id="sidebarOpacityValue">100%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Header</h3>
+                            <div class="form-group">
+                                <label>Hauteur du header (px)</label>
+                                <input type="range" id="headerHeight" min="50" max="150" value="80">
+                                <span class="range-value" id="headerHeightValue">80px</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="headerFixed">
+                                <label for="headerFixed">Header fixe</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="headerShadow">
+                                <label for="headerShadow">Ombre sous le header</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Espacement horizontal header (px)</label>
+                                <input type="range" id="headerPadding" min="10" max="50" value="24">
+                                <span class="range-value" id="headerPaddingValue">24px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Contenu principal</h3>
+                            <div class="form-group">
+                                <label>Largeur maximale du contenu (px)</label>
+                                <input type="range" id="contentMaxWidth" min="800" max="2000" value="1400">
+                                <span class="range-value" id="contentMaxWidthValue">1400px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Padding du contenu (px)</label>
+                                <input type="range" id="contentPadding" min="10" max="60" value="32">
+                                <span class="range-value" id="contentPaddingValue">32px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Espacement entre sections (px)</label>
+                                <input type="range" id="sectionSpacing" min="10" max="80" value="32">
+                                <span class="range-value" id="sectionSpacingValue">32px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Grille et colonnes</h3>
+                            <div class="form-group">
+                                <label>Nombre de colonnes par défaut</label>
+                                <select id="gridColumns">
+                                    <option value="1">1 colonne</option>
+                                    <option value="2">2 colonnes</option>
+                                    <option value="3" selected>3 colonnes</option>
+                                    <option value="4">4 colonnes</option>
+                                    <option value="5">5 colonnes</option>
+                                    <option value="6">6 colonnes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Espacement entre colonnes (px)</label>
+                                <input type="range" id="gridGap" min="10" max="60" value="24">
+                                <span class="range-value" id="gridGapValue">24px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Footer</h3>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="footerEnabled">
+                                <label for="footerEnabled">Afficher le footer</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Hauteur du footer (px)</label>
+                                <input type="range" id="footerHeight" min="40" max="200" value="60">
+                                <span class="range-value" id="footerHeightValue">60px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Texte du footer</label>
+                                <input type="text" id="footerText" placeholder="© 2024 SwiftPOS">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Components Section -->
+                <section id="components" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Boutons</h3>
+                            <div class="form-group">
+                                <label>Border radius des boutons (px)</label>
+                                <input type="range" id="buttonRadius" min="0" max="30" value="8">
+                                <span class="range-value" id="buttonRadiusValue">8px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Padding vertical boutons (px)</label>
+                                <input type="range" id="buttonPaddingY" min="4" max="20" value="10">
+                                <span class="range-value" id="buttonPaddingYValue">10px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Padding horizontal boutons (px)</label>
+                                <input type="range" id="buttonPaddingX" min="8" max="40" value="20">
+                                <span class="range-value" id="buttonPaddingXValue">20px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille de police des boutons (px)</label>
+                                <input type="range" id="buttonFontSize" min="12" max="20" value="14">
+                                <span class="range-value" id="buttonFontSizeValue">14px</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="buttonShadow">
+                                <label for="buttonShadow">Ombre sur les boutons</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="buttonUppercase">
+                                <label for="buttonUppercase">Texte en majuscules</label>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Cartes</h3>
+                            <div class="form-group">
+                                <label>Border radius des cartes (px)</label>
+                                <input type="range" id="cardRadius" min="0" max="30" value="18">
+                                <span class="range-value" id="cardRadiusValue">18px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Padding des cartes (px)</label>
+                                <input type="range" id="cardPadding" min="10" max="40" value="24">
+                                <span class="range-value" id="cardPaddingValue">24px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Intensité de l'ombre (0-100)</label>
+                                <input type="range" id="cardShadow" min="0" max="100" value="5">
+                                <span class="range-value" id="cardShadowValue">5%</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="cardHover">
+                                <label for="cardHover">Effet hover sur les cartes</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="cardBorder">
+                                <label for="cardBorder">Bordure sur les cartes</label>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Formulaires</h3>
+                            <div class="form-group">
+                                <label>Border radius des inputs (px)</label>
+                                <input type="range" id="inputRadius" min="0" max="20" value="8">
+                                <span class="range-value" id="inputRadiusValue">8px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Hauteur des inputs (px)</label>
+                                <input type="range" id="inputHeight" min="30" max="60" value="44">
+                                <span class="range-value" id="inputHeightValue">44px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Padding horizontal inputs (px)</label>
+                                <input type="range" id="inputPaddingX" min="8" max="20" value="12">
+                                <span class="range-value" id="inputPaddingXValue">12px</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="inputFocusGlow">
+                                <label for="inputFocusGlow">Effet glow au focus</label>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Tableaux</h3>
+                            <div class="form-group">
+                                <label>Border radius des cellules (px)</label>
+                                <input type="range" id="tableCellRadius" min="0" max="10" value="4">
+                                <span class="range-value" id="tableCellRadiusValue">4px</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="tableStriped">
+                                <label for="tableStriped">Lignes alternées (zebré)</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="tableHover">
+                                <label for="tableHover">Effet hover sur les lignes</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="tableBordered">
+                                <label for="tableBordered">Bordures visibles</label>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Modales</h3>
+                            <div class="form-group">
+                                <label>Border radius des modales (px)</label>
+                                <input type="range" id="modalRadius" min="0" max="30" value="16">
+                                <span class="range-value" id="modalRadiusValue">16px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Opacité du fond overlay (%)</label>
+                                <input type="range" id="modalOverlay" min="0" max="100" value="50">
+                                <span class="range-value" id="modalOverlayValue">50%</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="modalBackdrop">
+                                <label for="modalBackdrop">Fond flou (backdrop blur)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Badges et tags</h3>
+                            <div class="form-group">
+                                <label>Border radius des badges (px)</label>
+                                <input type="range" id="badgeRadius" min="0" max="20" value="12">
+                                <span class="range-value" id="badgeRadiusValue">12px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Padding des badges (px)</label>
+                                <input type="range" id="badgePadding" min="2" max="12" value="6">
+                                <span class="range-value" id="badgePaddingValue">6px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille de police des badges (px)</label>
+                                <input type="range" id="badgeFontSize" min="10" max="16" value="12">
+                                <span class="range-value" id="badgeFontSizeValue">12px</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Animations Section -->
+                <section id="animations" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Transitions générales</h3>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="animationsEnabled">
+                                <label for="animationsEnabled">Activer les animations</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Durée des transitions rapides (ms)</label>
+                                <input type="range" id="transitionFast" min="50" max="500" value="150">
+                                <span class="range-value" id="transitionFastValue">150ms</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Durée des transitions normales (ms)</label>
+                                <input type="range" id="transitionBase" min="100" max="1000" value="300">
+                                <span class="range-value" id="transitionBaseValue">300ms</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Durée des transitions lentes (ms)</label>
+                                <input type="range" id="transitionSlow" min="200" max="2000" value="500">
+                                <span class="range-value" id="transitionSlowValue">500ms</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Type d'animation</label>
+                                <select id="animationEasing">
+                                    <option value="ease">Ease</option>
+                                    <option value="ease-in">Ease-in</option>
+                                    <option value="ease-out">Ease-out</option>
+                                    <option value="ease-in-out" selected>Ease-in-out</option>
+                                    <option value="linear">Linear</option>
+                                    <option value="cubic-bezier(0.4, 0, 0.2, 1)">Cubic-bezier (Material)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Animations au chargement</h3>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="fadeInEnabled">
+                                <label for="fadeInEnabled">Fade-in au chargement</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="slideInEnabled">
+                                <label for="slideInEnabled">Slide-in au chargement</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="scaleInEnabled">
+                                <label for="scaleInEnabled">Scale-in au chargement</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Délai d'animation (ms)</label>
+                                <input type="range" id="animationDelay" min="0" max="1000" value="0">
+                                <span class="range-value" id="animationDelayValue">0ms</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Animations au hover</h3>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="hoverScale">
+                                <label for="hoverScale">Agrandissement au hover</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="hoverLift">
+                                <label for="hoverLift">Élévation au hover</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="hoverGlow">
+                                <label for="hoverGlow">Lueur au hover</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Intensité du hover (0-100)</label>
+                                <input type="range" id="hoverIntensity" min="0" max="100" value="10">
+                                <span class="range-value" id="hoverIntensityValue">10%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Animations de scroll</h3>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="scrollReveal">
+                                <label for="scrollReveal">Révélation au scroll</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="scrollParallax">
+                                <label for="scrollParallax">Effet parallaxe</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Vitesse du parallaxe (0-100)</label>
+                                <input type="range" id="parallaxSpeed" min="0" max="100" value="20">
+                                <span class="range-value" id="parallaxSpeedValue">20%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Icons Section -->
+                <section id="icons" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Icône principale</h3>
+                            <div class="form-group">
+                                <label>Icône de l'application (emoji ou texte)</label>
+                                <input type="text" id="appIcon" placeholder="⚡" maxlength="2">
+                            </div>
+                            <div class="form-group">
+                                <label>Taille des icônes (px)</label>
+                                <input type="range" id="iconSize" min="16" max="48" value="24">
+                                <span class="range-value" id="iconSizeValue">24px</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Espacement autour des icônes (px)</label>
+                                <input type="range" id="iconSpacing" min="4" max="20" value="8">
+                                <span class="range-value" id="iconSpacingValue">8px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Icônes de navigation</h3>
+                            <label>Icône Dashboard</label>
+                            <div class="icon-selector" data-icon="dashboard">
+                                <div class="icon-option" data-value="📊">📊</div>
+                                <div class="icon-option" data-value="🏠">🏠</div>
+                                <div class="icon-option" data-value="📈">📈</div>
+                                <div class="icon-option" data-value="⚡">⚡</div>
+                                <div class="icon-option" data-value="🎯">🎯</div>
+                            </div>
+                            
+                            <label style="margin-top: 1rem; display: block;">Icône Produits</label>
+                            <div class="icon-selector" data-icon="products">
+                                <div class="icon-option" data-value="📦">📦</div>
+                                <div class="icon-option" data-value="🛍️">🛍️</div>
+                                <div class="icon-option" data-value="📋">📋</div>
+                                <div class="icon-option" data-value="🛒">🛒</div>
+                            </div>
+                            
+                            <label style="margin-top: 1rem; display: block;">Icône Ventes</label>
+                            <div class="icon-selector" data-icon="sales">
+                                <div class="icon-option" data-value="💰">💰</div>
+                                <div class="icon-option" data-value="💵">💵</div>
+                                <div class="icon-option" data-value="💳">💳</div>
+                                <div class="icon-option" data-value="💸">💸</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Images Section -->
+                <section id="images" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Images de fond</h3>
+                            <div class="form-group">
+                                <label>Image de fond principale (URL)</label>
+                                <input type="url" id="bgImageUrl" placeholder="https://example.com/bg.jpg">
+                                <input type="file" id="bgImageFile" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>Position de l'image de fond</label>
+                                <select id="bgImagePosition">
+                                    <option value="center">Centre</option>
+                                    <option value="top">Haut</option>
+                                    <option value="bottom">Bas</option>
+                                    <option value="left">Gauche</option>
+                                    <option value="right">Droite</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille de l'image de fond</label>
+                                <select id="bgImageSize">
+                                    <option value="cover">Cover</option>
+                                    <option value="contain">Contain</option>
+                                    <option value="auto">Auto</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Opacité de l'image de fond (%)</label>
+                                <input type="range" id="bgImageOpacity" min="0" max="100" value="100">
+                                <span class="range-value" id="bgImageOpacityValue">100%</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="bgImageRepeat">
+                                <label for="bgImageRepeat">Répéter l'image</label>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Image de fond sidebar</h3>
+                            <div class="form-group">
+                                <label>Image de fond sidebar (URL)</label>
+                                <input type="url" id="sidebarBgImageUrl" placeholder="https://example.com/sidebar-bg.jpg">
+                                <input type="file" id="sidebarBgImageFile" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>Opacité de l'image sidebar (%)</label>
+                                <input type="range" id="sidebarBgImageOpacity" min="0" max="100" value="20">
+                                <span class="range-value" id="sidebarBgImageOpacityValue">20%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Image de fond header</h3>
+                            <div class="form-group">
+                                <label>Image de fond header (URL)</label>
+                                <input type="url" id="headerBgImageUrl" placeholder="https://example.com/header-bg.jpg">
+                                <input type="file" id="headerBgImageFile" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Texts Section -->
+                <section id="texts" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>Textes de navigation</h3>
+                            <div class="form-group">
+                                <label>Texte "Tableau de bord"</label>
+                                <input type="text" id="textDashboard" placeholder="Tableau de bord">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Produits"</label>
+                                <input type="text" id="textProducts" placeholder="Produits">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Ventes"</label>
+                                <input type="text" id="textSales" placeholder="Ventes">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Catégories"</label>
+                                <input type="text" id="textCategories" placeholder="Catégories">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Comptes"</label>
+                                <input type="text" id="textAccounts" placeholder="Comptes">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Textes de boutons</h3>
+                            <div class="form-group">
+                                <label>Texte "Enregistrer"</label>
+                                <input type="text" id="textSave" placeholder="Enregistrer">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Annuler"</label>
+                                <input type="text" id="textCancel" placeholder="Annuler">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Supprimer"</label>
+                                <input type="text" id="textDelete" placeholder="Supprimer">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Modifier"</label>
+                                <input type="text" id="textEdit" placeholder="Modifier">
+                            </div>
+                            <div class="form-group">
+                                <label>Texte "Ajouter"</label>
+                                <input type="text" id="textAdd" placeholder="Ajouter">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Messages système</h3>
+                            <div class="form-group">
+                                <label>Message de chargement</label>
+                                <input type="text" id="textLoading" placeholder="Chargement...">
+                            </div>
+                            <div class="form-group">
+                                <label>Message de succès</label>
+                                <input type="text" id="textSuccess" placeholder="Opération réussie">
+                            </div>
+                            <div class="form-group">
+                                <label>Message d'erreur</label>
+                                <input type="text" id="textError" placeholder="Une erreur est survenue">
+                            </div>
+                            <div class="form-group">
+                                <label>Message de confirmation</label>
+                                <input type="text" id="textConfirm" placeholder="Êtes-vous sûr ?">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Advanced Section -->
+                <section id="advanced" class="design-section">
+                    <div class="design-grid">
+                        <div class="design-card">
+                            <h3>CSS personnalisé</h3>
+                            <div class="form-group">
+                                <label>Code CSS personnalisé</label>
+                                <textarea id="customCSS" rows="10" placeholder="/* Votre CSS personnalisé ici */"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>JavaScript personnalisé</h3>
+                            <div class="form-group">
+                                <label>Code JavaScript personnalisé</label>
+                                <textarea id="customJS" rows="10" placeholder="// Votre JavaScript personnalisé ici"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Métadonnées</h3>
+                            <div class="form-group">
+                                <label>Meta description</label>
+                                <textarea id="metaDescription" rows="2" placeholder="Description pour les moteurs de recherche"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Meta keywords</label>
+                                <input type="text" id="metaKeywords" placeholder="mots, clés, séparés, par, virgules">
+                            </div>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Réinitialisation</h3>
+                            <p style="margin-bottom: 1rem; color: var(--color-text-secondary);">Réinitialiser toutes les personnalisations aux valeurs par défaut.</p>
+                            <button class="btn btn-secondary" id="resetAllBtn">Réinitialiser tout</button>
+                        </div>
+                        
+                        <div class="design-card">
+                            <h3>Export/Import</h3>
+                            <p style="margin-bottom: 1rem; color: var(--color-text-secondary);">Exporter ou importer votre configuration de personnalisation.</p>
+                            <div class="btn-group" style="flex-direction: column; gap: 0.5rem;">
+                                <button class="btn btn-secondary" id="exportBtn">Exporter la configuration</button>
+                                <button class="btn btn-secondary" id="importBtn">Importer la configuration</button>
+                                <input type="file" id="importFile" accept=".json" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Save Section -->
+                <div class="save-section">
+                    <div>
+                        <p style="color: var(--color-text-secondary); margin: 0;">Les modifications sont sauvegardées automatiquement</p>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="previewBtn">Aperçu</button>
+                        <button class="btn btn-primary" id="saveBtn">Enregistrer les modifications</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script type="module" src="js/design-loader.js"></script>
+    <script type="module" src="js/design.js"></script>
+</body>
+</html>
+

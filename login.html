@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - SwiftPOS</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/design-inline.js"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>⚡ SwiftPOS</h1>
+                <p>Point de Vente Premium</p>
+            </div>
+            
+            <form class="login-form" id="loginForm">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="votre@email.com" 
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Mot de passe</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="••••••••" 
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    Se connecter
+                </button>
+            </form>
+            
+            <div class="login-error" id="errorMessage"></div>
+            <div class="login-loading" id="loadingIndicator">
+                <div class="loading"></div>
+                <p style="margin-top: 10px; color: var(--color-primary);">Connexion en cours...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="js/design-loader.js"></script>
+    <script type="module" src="js/login.js"></script>
+</body>
+</html>
+

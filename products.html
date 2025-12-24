@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Produits - SwiftPOS</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="js/design-inline.js"></script>
+    <style>
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .products-table-card {
+            min-height: 500px;
+            width: 100%;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-filters-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 0.875rem 1.25rem 0.875rem 3rem;
+            background: var(--color-bg-primary);
+            border: 1.5px solid var(--color-gray-300);
+            border-radius: var(--border-radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.9375rem;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), var(--shadow-md);
+        }
+        
+        .search-container::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.125rem;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .filter-select {
+            padding: 0.875rem 1.25rem;
+            background: var(--color-bg-primary);
+            border: 1.5px solid var(--color-gray-300);
+            border-radius: var(--border-radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            min-width: 180px;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .btn-icon {
+            padding: 0.5rem 0.875rem;
+            font-size: 0.875rem;
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-weight: 500;
+        }
+        
+        .btn-icon:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .product-image-cell {
+            width: 80px;
+        }
+        
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: var(--border-radius-md);
+            border: 2px solid var(--color-gray-200);
+            background: var(--color-gray-100);
+        }
+        
+        .product-image-placeholder {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 100%);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            font-size: 1.5rem;
+            border: 2px solid var(--color-gray-200);
+        }
+        
+        .stock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-full);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .stock-badge.low {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
+            color: #dc2626;
+            border: 1.5px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .stock-badge.normal {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+            color: #059669;
+            border: 1.5px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .price-cell {
+            font-weight: 600;
+            color: var(--color-primary);
+            font-size: 1rem;
+        }
+        
+        .category-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .category-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active,
+        .modal-overlay.show {
+            display: flex !important;
+            opacity: 1 !important;
+        }
+
+        .modal {
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-2xl);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        
+        /* Modal horizontal moderne pour ajouter des produits */
+        .product-modal-horizontal {
+            max-width: 1200px;
+            width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius-xl);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .product-modal-horizontal .modal-header {
+            flex-shrink: 0;
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid var(--color-gray-200);
+            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-gray-50) 100%);
+            border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+        }
+        
+        .product-modal-horizontal .modal-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+        
+        .product-modal-horizontal .modal-body {
+            flex: 1;
+            overflow: hidden;
+            padding: 2.5rem;
+            display: flex;
+            align-items: stretch;
+        }
+        
+        .product-modal-horizontal .modal-footer {
+            flex-shrink: 0;
+            padding: 1.5rem 2.5rem;
+            border-top: 1px solid var(--color-gray-200);
+            background: var(--color-gray-50);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+        }
+        
+        .product-modal-horizontal .modal-footer .btn {
+            padding: 0.875rem 1.75rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            border-radius: var(--border-radius-lg);
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .product-modal-horizontal .modal-footer .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .product-modal-horizontal .modal-footer .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Layout horizontal du formulaire */
+        .product-form-horizontal {
+            display: flex;
+            gap: 3rem;
+            width: 100%;
+            height: 100%;
+            align-items: stretch;
+        }
+        
+        .product-form-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .product-form-right {
+            flex: 0 0 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        /* Styles pour les inputs dans le modal horizontal */
+        .product-form-horizontal .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+        
+        .product-form-horizontal .input-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .product-form-horizontal .input-group input,
+        .product-form-horizontal .input-group select {
+            padding: 0.875rem 1.125rem;
+            background: var(--color-bg-primary);
+            border: 2px solid var(--color-gray-300);
+            border-radius: var(--border-radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.9375rem;
+            transition: all var(--transition-base);
+            width: 100%;
+            font-family: inherit;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .product-form-horizontal .input-group input:focus,
+        .product-form-horizontal .input-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 2px 8px rgba(59, 130, 246, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .product-form-horizontal .input-group input:hover,
+        .product-form-horizontal .input-group select:hover {
+            border-color: var(--color-gray-400);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Zone d'upload d'image horizontale */
+        .image-upload-section-horizontal {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-upload-area-horizontal {
+            width: 100%;
+            height: 100%;
+            min-height: 350px;
+            border: 3px dashed var(--color-gray-300);
+            border-radius: var(--border-radius-xl);
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-bg-primary) 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            user-select: none;
+        }
+        
+        .image-upload-area-horizontal:hover {
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+        
+        .image-upload-area-horizontal.has-image {
+            border-style: solid;
+            border-color: var(--color-primary);
+            padding: 1rem;
+            background: var(--color-bg-primary);
+        }
+        
+        .upload-icon-horizontal {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        
+        .upload-title-horizontal {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-subtitle-horizontal {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-formats-horizontal {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        .image-preview-horizontal {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: var(--border-radius-lg);
+            display: none;
+            max-height: 350px;
+        }
+        
+        .image-preview-horizontal.show {
+            display: block;
+        }
+        
+        .remove-image-btn-horizontal {
+            margin-top: 1rem;
+            padding: 0.625rem 1.25rem;
+            background: var(--color-error);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .remove-image-btn-horizontal:hover {
+            background: var(--color-error-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        #imageUploadText {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        
+        .image-upload-area-horizontal.has-image #imageUploadText {
+            display: none;
+        }
+        
+        .image-preview-horizontal {
+            pointer-events: none;
+        }
+        
+        .image-upload-area-horizontal * {
+            pointer-events: none;
+        }
+        
+        .image-upload-area-horizontal .remove-image-btn-horizontal {
+            pointer-events: auto;
+        }
+        
+        /* Wizard Progress Bar */
+        .wizard-progress-container {
+            background: var(--color-bg-primary);
+            border-bottom: 1px solid var(--color-gray-200);
+            padding: 2.5rem 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 9;
+            width: 100%;
+        }
+        
+        .wizard-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--color-gray-200);
+            border-radius: 2px;
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+        }
+        
+        .wizard-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 25%;
+        }
+        
+        .wizard-steps-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 100%;
+            padding: 0 1rem;
+            gap: 0;
+        }
+        
+        .wizard-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+            min-width: 0;
+            padding: 0 1rem;
+        }
+        
+        .wizard-step::after {
+            content: '';
+            position: absolute;
+            top: 28px;
+            left: calc(50% + 28px);
+            width: calc(100% - 56px);
+            height: 3px;
+            background: var(--color-gray-300);
+            z-index: 0;
+        }
+        
+        .wizard-step:last-child::after {
+            display: none;
+        }
+        
+        .wizard-step.active::after,
+        .wizard-step.completed::after {
+            background: var(--color-primary);
+        }
+        
+        .wizard-step.completed + .wizard-step::after {
+            background: var(--color-primary);
+        }
+        
+        .wizard-step.active .wizard-step-line {
+            background: var(--color-primary);
+        }
+        
+        .wizard-step-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--color-gray-200);
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 3px solid var(--color-gray-200);
+            flex-shrink: 0;
+            z-index: 1;
+        }
+        
+        .wizard-step-check {
+            display: none;
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+        
+        .wizard-step.active .wizard-step-circle {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1);
+        }
+        
+        .wizard-step.completed .wizard-step-circle {
+            background: var(--color-success);
+            border-color: var(--color-success);
+        }
+        
+        .wizard-step.completed .wizard-step-number {
+            display: none;
+        }
+        
+        .wizard-step.completed .wizard-step-check {
+            display: block;
+        }
+        
+        .wizard-step-label {
+            margin-top: 1rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .wizard-step.active .wizard-step-label {
+            color: var(--color-primary);
+        }
+        
+        .wizard-step.completed .wizard-step-label {
+            color: var(--color-success);
+        }
+        
+        /* Wizard Step Content */
+        .wizard-step-content {
+            display: none;
+            animation: fadeInUp 0.4s ease;
+        }
+        
+        .wizard-step-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .step-content-wrapper {
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius-xl);
+            padding: 3rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--color-gray-200);
+        }
+        
+        .step-header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        
+        .step-header h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .step-header p {
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+        
+        .required-badge {
+            color: var(--color-error);
+            margin-left: 0.25rem;
+        }
+        
+        /* Image Upload Section */
+        .image-upload-section {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .image-upload-area {
+            width: 100%;
+            max-width: 600px;
+            border: 3px dashed var(--color-gray-300);
+            border-radius: var(--border-radius-xl);
+            padding: 3rem;
+            text-align: center;
+            background: var(--color-gray-50);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .image-upload-area:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-50);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+        
+        .image-upload-area.has-image {
+            border-style: solid;
+            padding: 1rem;
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-subtitle {
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-formats {
+            font-size: 0.8125rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: var(--border-radius-lg);
+            display: none;
+        }
+        
+        .image-preview.show {
+            display: block;
+        }
+        
+        .remove-image-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-error);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .remove-image-btn:hover {
+            background: var(--color-error-dark);
+            transform: translateY(-1px);
+        }
+        
+        /* Review Section */
+        .review-section {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .review-card {
+            width: 100%;
+            max-width: 700px;
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-xl);
+            padding: 2rem;
+            border: 1px solid var(--color-gray-200);
+        }
+        
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .review-label {
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            font-size: 0.9375rem;
+        }
+        
+        .review-value {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            font-size: 1rem;
+        }
+        
+        /* Confirmation Section */
+        .confirmation-section {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        
+        .confirmation-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .confirmation-section h4 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin: 0 0 1rem 0;
+        }
+        
+        .confirmation-section p {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+        
+        /* Wizard Navigation */
+        .wizard-navigation {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .wizard-navigation button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .products-list-container {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--color-gray-200);
+        }
+        
+        .added-product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-md);
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--color-gray-200);
+        }
+        
+        .added-product-info {
+            flex: 1;
+        }
+        
+        .added-product-name {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .added-product-details {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--color-gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--color-bg-primary);
+            z-index: 10;
+        }
+        
+        .modal-header h2 {
+            color: var(--color-text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .modal-close:hover {
+            background: var(--color-gray-100);
+            color: var(--color-text-primary);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--color-gray-200);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .image-preview-container {
+            margin-top: 1rem;
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: var(--border-radius-lg);
+            border: 2px solid var(--color-gray-200);
+            display: none;
+        }
+        
+        .image-preview.show {
+            display: block;
+        }
+        
+        .image-upload-area {
+            border: 2px dashed var(--color-gray-300);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            text-align: center;
+            background: var(--color-gray-50);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .image-upload-area:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-50);
+        }
+        
+        .image-upload-area.has-image {
+            border-style: solid;
+            padding: 0.5rem;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        .empty-state-text {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-subtext {
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .stats-bar {
+            display: flex;
+                gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-mini {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--color-gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .stat-mini-label {
+            font-size: 0.8125rem;
+            color: var(--color-text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-mini-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        /* Message de formulaire */
+        #formMessage {
+            margin-top: 1rem;
+        }
+        
+        #formMessage > div {
+            padding: 0.875rem 1.125rem;
+            border-radius: var(--border-radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .product-modal-horizontal {
+                width: 95vw;
+                max-height: 95vh;
+            }
+            
+            .product-form-horizontal {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .product-form-right {
+                flex: 0 0 auto;
+                min-height: 300px;
+            }
+            
+            .image-upload-area-horizontal {
+                min-height: 300px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal {
+                max-width: 100%;
+                margin: 1rem;
+            }
+            
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding: 1.25rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-container {
+                overflow-x: scroll;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .products-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions button {
+                flex: 1;
+            }
+            
+            .search-filters-container {
+                flex-direction: column;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>⚡ SwiftPOS</h2>
+                <p>Administration</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="admin.html">
+                            <span class="icon">📊</span>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li id="posNavItem" style="display: none;">
+                        <a href="pos.html">
+                            <span class="icon">⚡</span>
+                            <span>Point de vente</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="accounts.html">
+                            <span class="icon">👥</span>
+                            <span>Comptes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="categories.html">
+                            <span class="icon">🏷️</span>
+                            <span>Catégories</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="products.html" class="active">
+                            <span class="icon">📦</span>
+                            <span>Produits</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="barcodes.html">
+                            <span class="icon">📋</span>
+                            <span>Codes-Barres</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="promotions.html">
+                            <span class="icon">🎯</span>
+                            <span>Promotions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="sales-history.html">
+                            <span class="icon">💰</span>
+                            <span>Ventes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reports.html">
+                            <span class="icon">📈</span>
+                            <span>Rapports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="design.html">
+                            <span class="icon">🎨</span>
+                            <span>Personnalisation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="settings.html">
+                            <span class="icon">⚙️</span>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-user">
+                <div class="sidebar-user-info">
+                    <p class="name" id="userName">Admin</p>
+                    <p class="email" id="userEmail">admin@swiftpos.com</p>
+                </div>
+                <button class="btn btn-secondary" id="logoutBtn" style="width: 100%;">
+                    Déconnexion
+                </button>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="main-header">
+                <h1>Gestion des Produits</h1>
+            </div>
+            
+            <!-- Statistiques rapides -->
+            <div class="stats-bar">
+                <div class="stat-mini">
+                    <div class="stat-mini-label">Total produits</div>
+                    <div class="stat-mini-value" id="totalProductsStat">0</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-label">Stock faible</div>
+                    <div class="stat-mini-value" id="lowStockStat" style="color: var(--color-error);">0</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-label">Valeur totale</div>
+                    <div class="stat-mini-value" id="totalValueStat">$0.00</div>
+                </div>
+            </div>
+            
+            <!-- Liste des produits -->
+            <div class="products-table-card card">
+                <div class="products-header">
+                    <h2 style="color: var(--color-text-primary); font-size: 1.5rem; font-weight: 700; margin: 0;">
+                        Liste des produits
+                    </h2>
+                <div class="header-actions">
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                        <button class="btn btn-secondary" id="importCsvBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <span>📥</span>
+                            <span>Importer CSV</span>
+                        </button>
+                        <button class="btn btn-primary" id="addProductBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <span>➕</span>
+                            <span>Ajouter un produit</span>
+                    </button>
+                </div>
+            </div>
+            
+                <div class="search-filters-container">
+                    <button class="btn btn-secondary" id="searchBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span>🔍</span>
+                        <span>Chercher</span>
+                    </button>
+                    <button class="btn btn-secondary" id="filterBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span>🔽</span>
+                        <span>Filtrer</span>
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Nom</th>
+                                <th>Prix</th>
+                                <th>Catégorie</th>
+                                <th>Stock</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 3rem;">
+                                    <div class="loading" style="margin: 0 auto;"></div>
+                                    <p style="margin-top: 1rem; color: var(--color-text-secondary);">Chargement des produits...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal pour ajouter/modifier un produit (design horizontal moderne) -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal product-modal-horizontal">
+            <div class="modal-header">
+                <div style="flex: 1;">
+                    <h2 id="modalTitle">Ajouter un produit</h2>
+                    <p style="margin: 0.5rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;" id="modalSubtitle">
+                        Remplissez les informations ci-dessous
+                    </p>
+                </div>
+                <button class="modal-close" id="closeModalBtn" aria-label="Fermer">×</button>
+                </div>
+                
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="productId" name="productId">
+                    
+                    <div class="product-form-horizontal">
+                        <!-- Colonne gauche : Formulaire -->
+                        <div class="product-form-left">
+                            <div class="form-section">
+                                <div class="input-group">
+                                    <label for="productName">
+                                        <span>Nom du produit</span>
+                                        <span class="required-badge">*</span>
+                                    </label>
+                                    <input type="text" id="productName" name="name" placeholder="Ex: iPhone 15 Pro Max" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                <div class="input-group">
+                                    <label for="productPrice">
+                                        <span>Prix ($)</span>
+                                        <span class="required-badge">*</span>
+                                    </label>
+                                    <input type="number" id="productPrice" name="price" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label for="productStock">
+                                        <span>Stock</span>
+                                        <span class="required-badge">*</span>
+                                    </label>
+                                    <input type="number" id="productStock" name="stock" min="0" placeholder="0" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label for="productCategory">
+                                        <span>Catégorie</span>
+                                        <span class="required-badge">*</span>
+                                    </label>
+                                    <select id="productCategory" name="categoryId" required>
+                                        <option value="">Sélectionner une catégorie...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="formMessage"></div>
+                            </div>
+                            
+                        <!-- Colonne droite : Upload d'image -->
+                        <div class="product-form-right">
+                            <div class="image-upload-section-horizontal">
+                                <div class="image-upload-area-horizontal" id="imageUploadArea">
+                                    <input type="file" id="productImage" name="image" accept="image/*" style="display: none;">
+                                    <div id="imageUploadText">
+                                        <div class="upload-icon-horizontal">📷</div>
+                                        <div class="upload-title-horizontal">Ajouter une image</div>
+                                        <div class="upload-subtitle-horizontal">Cliquez ou glissez-déposez</div>
+                                        <div class="upload-formats-horizontal">PNG, JPG, WEBP</div>
+                                    </div>
+                                    <img id="imagePreview" class="image-preview-horizontal" alt="Aperçu">
+                                    <button type="button" class="remove-image-btn-horizontal" id="removeImageBtn" style="display: none;">
+                                        ✕ Supprimer
+                                    </button>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelBtn">
+                    Annuler
+                </button>
+                <button type="button" class="btn btn-primary" id="saveProductBtn">
+                        <span>💾</span> Enregistrer le produit
+                    </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de recherche -->
+    <div class="modal-overlay" id="searchModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>🔍 Rechercher des produits</h2>
+                <button class="modal-close" id="closeSearchModalBtn" aria-label="Fermer">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="searchInputModal">Rechercher par nom ou catégorie</label>
+                    <input type="text" id="searchInputModal" placeholder="Entrez votre recherche...">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelSearchBtn">Annuler</button>
+                <button type="button" class="btn btn-primary" id="applySearchBtn">Chercher</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de filtres -->
+    <div class="modal-overlay" id="filterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>🔽 Filtrer les produits</h2>
+                <button class="modal-close" id="closeFilterModalBtn" aria-label="Fermer">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="categoryFilterModal">Catégorie</label>
+                    <select id="categoryFilterModal">
+                        <option value="">Toutes les catégories</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="stockFilterModal">Stock</label>
+                    <select id="stockFilterModal">
+                        <option value="">Tous les stocks</option>
+                        <option value="low">Stock faible</option>
+                        <option value="normal">Stock normal</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="resetFilterBtn">Réinitialiser</button>
+                <button type="button" class="btn btn-primary" id="applyFilterBtn">Appliquer</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="js/design-loader.js"></script>
+    <script type="module" src="js/products.js"></script>
+</body>
+</html>
