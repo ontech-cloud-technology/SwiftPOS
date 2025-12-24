@@ -1,0 +1,297 @@
+/* Styles pour la page d'accueil - Design Ultra Moderne */
+.home-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f9fafb 0%, #ffffff 50%, #f3f4f6 100%);
+}
+
+/* Hero Section */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+    animation: pulse 20s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.05); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 900px;
+}
+
+.hero-title {
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--color-text-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+}
+
+.hero-subtitle {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: 3rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-large {
+    padding: 1.25rem 3rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius-xl);
+}
+
+/* Features Section */
+.features {
+    padding: 6rem 2rem;
+    position: relative;
+    background: var(--color-bg-primary);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--color-text-primary);
+    margin-bottom: 4rem;
+    position: relative;
+    letter-spacing: -0.02em;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+    border-radius: 2px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 4rem;
+}
+
+.feature-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--border-radius-xl);
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transition-base);
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--color-gray-300);
+    box-shadow: var(--shadow-xl);
+}
+
+.feature-card:hover::before {
+    transform: scaleX(1);
+}
+
+.feature-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    transition: transform var(--transition-base);
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+.feature-card h3 {
+    color: var(--color-text-primary);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    font-size: 1.0625rem;
+}
+
+/* Tech Stack Section */
+.tech-stack {
+    padding: 6rem 2rem;
+    background: var(--color-gray-50);
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 4rem;
+}
+
+.tech-item {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--color-text-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.tech-item:hover {
+    background: var(--color-primary-50);
+    border-color: var(--color-primary);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    color: var(--color-primary);
+}
+
+/* CTA Section */
+.cta {
+    padding: 6rem 2rem;
+    background: var(--color-bg-primary);
+}
+
+.cta-card {
+    background: var(--color-primary-50);
+    border: 1px solid var(--color-primary-100);
+    border-radius: var(--border-radius-2xl);
+    padding: 4rem 3rem;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+.cta-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.cta-card h2 {
+    font-size: 2.75rem;
+    font-weight: 900;
+    color: var(--color-text-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.cta-card p {
+    color: var(--color-text-secondary);
+    font-size: 1.25rem;
+    margin-bottom: 2.5rem;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 3rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+    }
+    
+    .hero-description {
+        font-size: 1.0625rem;
+    }
+    
+    .section-title {
+        font-size: 2.25rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .cta-card {
+        padding: 3rem 2rem;
+    }
+    
+    .cta-card h2 {
+        font-size: 2rem;
+    }
+}
