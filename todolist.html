@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 Plan de Développement - SwiftPOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #d4af37;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 50px;
+            font-size: 1.2em;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section h2 {
+            color: #d4af37;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section h3 {
+            color: #d4af37;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .task-list li {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #d4af37;
+            transition: all 0.3s ease;
+        }
+        
+        .task-list li:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .task-list li strong {
+            color: #d4af37;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .priority {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        .priority.high {
+            background: rgba(255, 77, 77, 0.2);
+            color: #ff4d4d;
+        }
+        
+        .priority.medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .priority.low {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .file-structure {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+        
+        .file-structure pre {
+            color: #d4af37;
+            white-space: pre-wrap;
+        }
+        
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f4d03f);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Plan de Développement SwiftPOS</h1>
+        <p class="subtitle">Application Web POS Premium avec Firebase</p>
+        
+        <!-- SECTION 1: ARCHITECTURE -->
+        <div class="section">
+            <h2><span class="emoji">🏗️</span>1. ARCHITECTURE DES FICHIERS</h2>
+            <div class="file-structure">
+                <pre>
+SwiftPOS/
+├── index.html (Login)
+├── admin.html (Dashboard Admin)
+├── user.html (Dashboard Caissier)
+├── products.html (Gestion Produits - Admin)
+├── accounts.html (Gestion Comptes - Admin)
+├── sales-history.html (Historique Ventes)
+├── css/
+│   ├── style.css (Styles globaux)
+│   ├── login.css (Styles login)
+│   ├── dashboard.css (Styles dashboards)
+│   └── components.css (Composants réutilisables)
+├── js/
+│   ├── firebase-config.js (Configuration Firebase)
+│   ├── auth.js (Gestion authentification)
+│   ├── firestore.js (Opérations Firestore)
+│   ├── storage.js (Gestion Storage)
+│   ├── admin.js (Logique admin)
+│   ├── user.js (Logique caissier)
+│   ├── products.js (Gestion produits)
+│   ├── sales.js (Gestion ventes)
+│   └── utils.js (Utilitaires)
+├── firestore.rules (Règles de sécurité)
+└── README.md (Instructions déploiement)
+                </pre>
+            </div>
+        </div>
+        
+        <!-- SECTION 2: CONFIGURATION FIREBASE -->
+        <div class="section">
+            <h2><span class="emoji">⚙️</span>2. CONFIGURATION FIREBASE</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>firebase-config.js</strong> <span class="priority high">HAUTE</span>
+                    <div>Initialisation Firebase (Auth, Firestore, Storage)</div>
+                    <div>Variables de configuration</div>
+                </li>
+                <li>
+                    <strong>firestore.rules</strong> <span class="priority high">HAUTE</span>
+                    <div>Règles de sécurité complètes</div>
+                    <div>Admin: lecture/écriture totale</div>
+                    <div>User: lecture ses ventes uniquement</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 3: AUTHENTIFICATION -->
+        <div class="section">
+            <h2><span class="emoji">🔐</span>3. SYSTÈME D'AUTHENTIFICATION</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>index.html (Login)</strong> <span class="priority high">HAUTE</span>
+                    <div>Design luxueux noir + or</div>
+                    <div>Formulaire email/password</div>
+                    <div>Validation côté client</div>
+                    <div>Messages d'erreur élégants</div>
+                </li>
+                <li>
+                    <strong>auth.js</strong> <span class="priority high">HAUTE</span>
+                    <div>Fonction login(email, password)</div>
+                    <div>Fonction logout()</div>
+                    <div>Vérification rôle utilisateur</div>
+                    <div>Redirection automatique (admin/user)</div>
+                    <div>Gestion session persistée</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 4: DASHBOARD ADMIN -->
+        <div class="section">
+            <h2><span class="emoji">👑</span>4. DASHBOARD ADMINISTRATEUR</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>admin.html</strong> <span class="priority high">HAUTE</span>
+                    <div>Sidebar luxueuse avec navigation</div>
+                    <div>Sections: Comptes, Produits, Ventes</div>
+                    <div>Header avec nom admin + logout</div>
+                    <div>Design glassmorphism</div>
+                </li>
+                <li>
+                    <strong>admin.js</strong> <span class="priority high">HAUTE</span>
+                    <div>Chargement données au démarrage</div>
+                    <div>Navigation entre sections</div>
+                    <div>Statistiques globales</div>
+                </li>
+            </ul>
+            
+            <h3>4.1 Gestion des Comptes (accounts.html)</h3>
+            <ul class="task-list">
+                <li>
+                    <strong>Interface</strong> <span class="priority high">HAUTE</span>
+                    <div>Formulaire création utilisateur (name, email, role)</div>
+                    <div>Table moderne avec tous les comptes</div>
+                    <div>Actions: Modifier, Supprimer, Réinitialiser mot de passe</div>
+                </li>
+                <li>
+                    <strong>Fonctionnalités</strong> <span class="priority high">HAUTE</span>
+                    <div>Création compte avec rôle</div>
+                    <div>Suppression compte</div>
+                    <div>Envoi email réinitialisation mot de passe</div>
+                    <div>Filtres et recherche</div>
+                </li>
+            </ul>
+            
+            <h3>4.2 Gestion des Produits (products.html)</h3>
+            <ul class="task-list">
+                <li>
+                    <strong>Interface</strong> <span class="priority high">HAUTE</span>
+                    <div>Formulaire ajout produit (name, price, category, stock, image)</div>
+                    <div>Upload image vers Firebase Storage</div>
+                    <div>Table produits avec images</div>
+                    <div>Actions: Modifier, Supprimer</div>
+                </li>
+                <li>
+                    <strong>Fonctionnalités</strong> <span class="priority high">HAUTE</span>
+                    <div>Ajout produit avec image</div>
+                    <div>Modification produit</div>
+                    <div>Suppression produit</div>
+                    <div>Gestion stock</div>
+                    <div>Catégories dynamiques</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 5: DASHBOARD CAISSIER -->
+        <div class="section">
+            <h2><span class="emoji">💰</span>5. DASHBOARD CAISSIER (USER)</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>user.html</strong> <span class="priority high">HAUTE</span>
+                    <div>Interface de caisse moderne</div>
+                    <div>Grille produits par cartes (glassmorphism)</div>
+                    <div>Panier en temps réel à droite</div>
+                    <div>Bouton "Confirmer la vente"</div>
+                </li>
+                <li>
+                    <strong>user.js</strong> <span class="priority high">HAUTE</span>
+                    <div>Chargement produits depuis Firestore</div>
+                    <div>Gestion panier (ajout, suppression, quantité)</div>
+                    <div>Calcul total + taxes (TPS/TVQ)</div>
+                    <div>Confirmation vente → enregistrement Firestore</div>
+                    <div>Déduction stock automatique</div>
+                    <div>Notification succès</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 6: HISTORIQUE DES VENTES -->
+        <div class="section">
+            <h2><span class="emoji">📊</span>6. HISTORIQUE DES VENTES</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>sales-history.html</strong> <span class="priority medium">MOYENNE</span>
+                    <div>Table moderne avec toutes les ventes</div>
+                    <div>Filtres: Date, Utilisateur, Montant</div>
+                    <div>Détails produits par vente</div>
+                </li>
+                <li>
+                    <strong>Logique</strong> <span class="priority medium">MOYENNE</span>
+                    <div>Admin: voir toutes les ventes</div>
+                    <div>User: voir uniquement ses ventes</div>
+                    <div>Export possible (futur)</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 7: STYLES & DESIGN -->
+        <div class="section">
+            <h2><span class="emoji">🎨</span>7. DESIGN PREMIUM</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>Palette de couleurs</strong> <span class="priority high">HAUTE</span>
+                    <div>Noir: #0a0a0a, #1a1a1a</div>
+                    <div>Or: #d4af37, #f4d03f</div>
+                    <div>Blanc: #ffffff, rgba(255,255,255,0.9)</div>
+                </li>
+                <li>
+                    <strong>Composants CSS</strong> <span class="priority high">HAUTE</span>
+                    <div>Cards glassmorphism (backdrop-filter)</div>
+                    <div>Boutons avec hover glow</div>
+                    <div>Inputs modernes avec focus states</div>
+                    <div>Tables élégantes</div>
+                    <div>Sidebar luxueuse</div>
+                </li>
+                <li>
+                    <strong>Animations</strong> <span class="priority medium">MOYENNE</span>
+                    <div>Fade-in au chargement</div>
+                    <div>Slide transitions</div>
+                    <div>Hover effects</div>
+                    <div>Loading states</div>
+                </li>
+                <li>
+                    <strong>Responsive Design</strong> <span class="priority high">HAUTE</span>
+                    <div>Mobile-first approach</div>
+                    <div>Breakpoints: 768px, 1024px, 1440px</div>
+                    <div>Navigation mobile (hamburger)</div>
+                    <div>Grille produits adaptative</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 8: FONCTIONNALITÉS TECHNIQUES -->
+        <div class="section">
+            <h2><span class="emoji">⚡</span>8. FONCTIONNALITÉS TECHNIQUES</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>Gestion Panier</strong> <span class="priority high">HAUTE</span>
+                    <div>LocalStorage pour persistance</div>
+                    <div>Mise à jour temps réel</div>
+                    <div>Validation stock disponible</div>
+                </li>
+                <li>
+                    <strong>Calcul Taxes</strong> <span class="priority medium">MOYENNE</span>
+                    <div>TPS/TVQ configurables (settings collection)</div>
+                    <div>Calcul automatique</div>
+                    <div>Affichage détaillé</div>
+                </li>
+                <li>
+                    <strong>Gestion Stock</strong> <span class="priority high">HAUTE</span>
+                    <div>Vérification avant ajout panier</div>
+                    <div>Déduction après vente</div>
+                    <div>Alertes stock faible</div>
+                </li>
+                <li>
+                    <strong>Upload Images</strong> <span class="priority medium">MOYENNE</span>
+                    <div>Firebase Storage</div>
+                    <div>Preview avant upload</div>
+                    <div>Compression si nécessaire</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 9: SÉCURITÉ -->
+        <div class="section">
+            <h2><span class="emoji">🔒</span>9. SÉCURITÉ</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>Firestore Rules</strong> <span class="priority high">HAUTE</span>
+                    <div>users: admin peut tout, user peut lire son propre doc</div>
+                    <div>products: admin peut tout, user peut lire</div>
+                    <div>sales: admin peut tout, user peut créer et lire ses ventes</div>
+                    <div>settings: lecture seule pour tous</div>
+                </li>
+                <li>
+                    <strong>Validation Côté Client</strong> <span class="priority medium">MOYENNE</span>
+                    <div>Validation formulaires</div>
+                    <div>Protection routes (vérification auth)</div>
+                    <div>Sanitization inputs</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- SECTION 10: DOCUMENTATION -->
+        <div class="section">
+            <h2><span class="emoji">📚</span>10. DOCUMENTATION</h2>
+            <ul class="task-list">
+                <li>
+                    <strong>README.md</strong> <span class="priority low">BASSE</span>
+                    <div>Instructions installation Firebase</div>
+                    <div>Configuration projet</div>
+                    <div>Déploiement</div>
+                    <div>Structure collections Firestore</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- PROGRESS BAR -->
+        <div class="section">
+            <h2><span class="emoji">📈</span>PROGRESSION</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: #888;">
+                <span id="progress-text">0%</span> - Prêt à commencer le développement
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Animation de la barre de progression (pour démonstration)
+        setTimeout(() => {
+            document.getElementById('progress').style.width = '5%';
+            document.getElementById('progress-text').textContent = '5% - Plan créé';
+        }, 500);
+    </script>
+</body>
+</html>
+

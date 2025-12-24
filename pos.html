@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caisse - SwiftPOS</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/pos.css">
+    <script src="js/design-inline.js"></script>
+</head>
+<body>
+    <div class="pos-page-container">
+        <!-- Zone centrale : PRODUITS -->
+        <main class="pos-main-content">
+            <div class="pos-header">
+                <div class="pos-header-left">
+                    <h1>⚡ Point de Vente</h1>
+                </div>
+                <button type="button" class="btn-profile" id="profileBtn" title="Profil">
+                    <span class="profile-icon">👤</span>
+                    <span class="profile-name" id="headerUserName">Caissier</span>
+                </button>
+            </div>
+            
+            <!-- Filtres et recherche -->
+            <div class="pos-filters">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="productSearch" 
+                        placeholder="🔍 Rechercher un produit..."
+                        class="search-input"
+                    >
+                </div>
+                <div class="filter-group">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">Toutes les catégories</option>
+                    </select>
+                    <select id="sortFilter" class="filter-select">
+                        <option value="name">Trier par nom</option>
+                        <option value="price-asc">Prix croissant</option>
+                        <option value="price-desc">Prix décroissant</option>
+                        <option value="stock">Stock disponible</option>
+                    </select>
+                    <button class="btn btn-secondary" id="resetFilters">
+                        Réinitialiser
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Grille de produits -->
+            <div class="products-section">
+                <div id="productsLoading" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Chargement des produits...</p>
+                </div>
+                <div id="productsGrid" class="products-grid">
+                    <!-- Les produits seront chargés ici -->
+                </div>
+                <div id="productsEmpty" class="empty-state" style="display: none;">
+                    <p>🔍 Aucun produit trouvé</p>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Zone droite fixe : PANIER -->
+        <aside class="cart-sidebar">
+            <div class="cart-header">
+                <h2>🛒 Panier</h2>
+                <button class="btn btn-secondary btn-sm" id="clearCartBtn" style="display: none;">
+                    Vider
+                </button>
+            </div>
+            
+            <div class="cart-items" id="cartItems">
+                <div class="cart-empty">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p>Votre panier est vide</p>
+                    <span>Ajoutez des produits pour commencer</span>
+                </div>
+            </div>
+            
+            <div class="cart-footer">
+                <div class="cart-summary">
+                    <div class="cart-summary-row">
+                        <span>Sous-total</span>
+                        <span id="cartSubtotal">$0.00</span>
+                    </div>
+                    <div class="cart-summary-row" id="tpsRow" style="display: none;">
+                        <span id="tpsLabel">TPS (5%)</span>
+                        <span id="cartTps">$0.00</span>
+                    </div>
+                    <div class="cart-summary-row" id="tvqRow" style="display: none;">
+                        <span id="tvqLabel">TVQ (9.975%)</span>
+                        <span id="cartTvq">$0.00</span>
+                    </div>
+                    <div class="cart-summary-row cart-total">
+                        <span>Total</span>
+                        <span id="cartTotal">$0.00</span>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-checkout" id="checkoutBtn" disabled>
+                    <span class="checkout-icon">✓</span>
+                    <span>Confirmer la vente</span>
+                </button>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Modal de confirmation et paiement -->
+    <div id="confirmModal" class="modal payment-modal-fullscreen">
+        <div class="payment-modal-content-fullscreen">
+            <div class="payment-modal-header-compact">
+                <div class="payment-header-left">
+                    <h3>💳 Paiement</h3>
+                    <div class="payment-total-inline">
+                        <span class="payment-total-label-inline">Total à payer:</span>
+                        <span class="payment-total-amount-inline" id="paymentTotalAmount">$0.00</span>
+                    </div>
+                </div>
+                <button class="modal-close" id="cancelConfirmBtn">×</button>
+            </div>
+            
+            <div class="payment-modal-body">
+                <!-- Mode de paiement (EN HAUT, HORIZONTAL) -->
+                <div class="payment-method-section-top">
+                    <h4>Mode de paiement</h4>
+                    <div class="payment-methods-grid-horizontal">
+                        <button class="payment-method-btn active" data-method="cash" id="methodCash">
+                            <span class="method-icon">💵</span>
+                            <span class="method-name">Comptant</span>
+                        </button>
+                        <button class="payment-method-btn" data-method="card" id="methodCard">
+                            <span class="method-icon">💳</span>
+                            <span class="method-name">Carte</span>
+                        </button>
+                        <button class="payment-method-btn" data-method="debit" id="methodDebit">
+                            <span class="method-icon">🏦</span>
+                            <span class="method-name">Débit</span>
+                        </button>
+                        <button class="payment-method-btn" data-method="mobile" id="methodMobile">
+                            <span class="method-icon">📱</span>
+                            <span class="method-name">Mobile</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Contenu principal : Layout horizontal optimisé -->
+                <div class="payment-content-horizontal">
+                    <!-- Section comptant (GAUCHE - Clavier et infos) -->
+                    <div class="cash-payment-section" id="cashPaymentSection">
+                        <div class="cash-input-group">
+                            <label for="cashAmount">Argent donné</label>
+                            <div class="cash-input-wrapper">
+                                <span class="currency-symbol" id="cashCurrencySymbol">$</span>
+                                <input 
+                                    type="text" 
+                                    id="cashAmount" 
+                                    class="cash-input"
+                                    placeholder="0.00"
+                                    readonly
+                                    inputmode="none"
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- Clavier numérique virtuel compact -->
+                        <div class="virtual-keyboard-compact">
+                            <div class="keyboard-row">
+                                <button class="keyboard-key" data-key="1">1</button>
+                                <button class="keyboard-key" data-key="2">2</button>
+                                <button class="keyboard-key" data-key="3">3</button>
+                            </div>
+                            <div class="keyboard-row">
+                                <button class="keyboard-key" data-key="4">4</button>
+                                <button class="keyboard-key" data-key="5">5</button>
+                                <button class="keyboard-key" data-key="6">6</button>
+                            </div>
+                            <div class="keyboard-row">
+                                <button class="keyboard-key" data-key="7">7</button>
+                                <button class="keyboard-key" data-key="8">8</button>
+                                <button class="keyboard-key" data-key="9">9</button>
+                            </div>
+                            <div class="keyboard-row">
+                                <button class="keyboard-key keyboard-key-dot" data-key=".">.</button>
+                                <button class="keyboard-key" data-key="0">0</button>
+                                <button class="keyboard-key keyboard-key-backspace" data-key="backspace">
+                                    <span class="backspace-icon">⌫</span>
+                                </button>
+                            </div>
+                            <div class="keyboard-row">
+                                <button class="keyboard-key keyboard-key-clear" data-key="clear">Effacer</button>
+                                <button class="keyboard-key keyboard-key-enter" data-key="enter">Entrée</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons rapides pour montants courants -->
+                        <div class="quick-amount-buttons">
+                            <button class="quick-amount-btn" data-amount="10">+$10</button>
+                            <button class="quick-amount-btn" data-amount="20">+$20</button>
+                            <button class="quick-amount-btn" data-amount="50">+$50</button>
+                            <button class="quick-amount-btn" data-amount="100">+$100</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Section droite (Info paiement ou monnaie) -->
+                    <div class="payment-right-section">
+                        <!-- Affichage de la monnaie à rendre (pour comptant) -->
+                        <div class="cash-change-display" id="cashChangeDisplay" style="display: none;">
+                            <div class="change-label" id="changeLabel">Monnaie à rendre</div>
+                            <div class="change-amount" id="changeAmount">$0.00</div>
+                        </div>
+                        
+                        <!-- Section pour les autres modes de paiement (non-comptant) -->
+                        <div class="non-cash-payment-section" id="nonCashPaymentSection" style="display: none;">
+                            <div class="payment-info-card">
+                                <div class="payment-info-icon" id="paymentInfoIcon">💳</div>
+                                <h3 class="payment-info-title" id="paymentInfoTitle">Paiement par Carte</h3>
+                                <p class="payment-info-description" id="payment-info-description">
+                                    Le montant total sera traité via le terminal de paiement.
+                                </p>
+                                <div class="payment-total-display">
+                                    <span class="payment-total-label">Montant à payer</span>
+                                    <span class="payment-total-value" id="nonCashTotalAmount">$0.00</span>
+                                </div>
+                                <div class="payment-instructions">
+                                    <div class="instruction-item">
+                                        <span class="instruction-number">1</span>
+                                        <span class="instruction-text">Insérez ou glissez la carte</span>
+                                    </div>
+                                    <div class="instruction-item">
+                                        <span class="instruction-number">2</span>
+                                        <span class="instruction-text">Suivez les instructions du terminal</span>
+                                    </div>
+                                    <div class="instruction-item">
+                                        <span class="instruction-number">3</span>
+                                        <span class="instruction-text">Confirmez le paiement</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-modal-footer">
+                <button class="btn btn-secondary" id="cancelPaymentBtn">Annuler</button>
+                <button class="btn btn-primary btn-confirm-payment" id="confirmPaymentBtn" disabled>
+                    <span>Confirmer le paiement</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loader overlay -->
+    <div id="loaderOverlay" class="loader-overlay" style="display: none;">
+        <div class="loader-content">
+            <div class="spinner-large"></div>
+            <p>Traitement en cours...</p>
+        </div>
+    </div>
+    
+    <!-- Animation de succès -->
+    <div id="successAnimation" class="success-animation" style="display: none;">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>Vente confirmée !</h2>
+            <p id="successMessage">Paiement effectué avec succès</p>
+        </div>
+    </div>
+    
+    <!-- Modal Profil -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content profile-modal-content">
+            <div class="profile-modal-header">
+                <h2>👤 Mon Profil</h2>
+                <button class="modal-close" id="closeProfileModal">×</button>
+            </div>
+            
+            <div class="profile-modal-body">
+                <!-- Informations utilisateur -->
+                <div class="profile-section">
+                    <h3>Informations</h3>
+                    <div class="profile-info">
+                        <div class="profile-info-item">
+                            <span class="label">Nom:</span>
+                            <span class="value" id="profileUserName">-</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="label">Email:</span>
+                            <span class="value" id="profileUserEmail">-</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="label">Rôle:</span>
+                            <span class="value" id="profileUserRole">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistiques -->
+                <div class="profile-section">
+                    <h3>📊 Statistiques</h3>
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Ventes aujourd'hui</div>
+                                <div class="stat-value" id="statSalesToday">0</div>
+                            </div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total ventes</div>
+                                <div class="stat-value" id="statTotalSales">0</div>
+                            </div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="stat-icon">💵</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Revenus aujourd'hui</div>
+                                <div class="stat-value" id="statRevenueToday">$0.00</div>
+                            </div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Revenus total</div>
+                                <div class="stat-value" id="statTotalRevenue">$0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export -->
+                <div class="profile-section">
+                    <h3>📥 Export des données</h3>
+                    <div class="profile-export-options">
+                        <button class="btn-export" id="exportTodayBtn">
+                            <span class="export-icon">📄</span>
+                            <span>Exporter ventes d'aujourd'hui (CSV)</span>
+                        </button>
+                        <button class="btn-export" id="exportAllBtn">
+                            <span class="export-icon">📊</span>
+                            <span>Exporter toutes mes ventes (CSV)</span>
+                        </button>
+                        <button class="btn-export" id="exportTodayJSONBtn">
+                            <span class="export-icon">📋</span>
+                            <span>Exporter ventes d'aujourd'hui (JSON)</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="profile-section">
+                    <h3>⚙️ Actions</h3>
+                    <div class="profile-actions">
+                        <button class="btn btn-primary" id="goToAdminBtn" style="display: none;">
+                            <span>👑</span> Aller à Admin
+                        </button>
+                        <button class="btn btn-secondary" id="profileLogoutBtn">
+                            Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="js/design-loader.js"></script>
+    <script type="module" src="js/pos.js"></script>
+</body>
+</html>
+

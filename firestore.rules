@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function pour vérifier si l'utilisateur est authentifié
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function pour vérifier si l'utilisateur est admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Helper function pour vérifier si l'utilisateur est le propriétaire
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Collection users
+    match /users/{userId} {
+      // Admin peut tout faire
+      allow read, write: if isAdmin();
+      
+      // L'utilisateur peut lire son propre document
+      allow read: if isOwner(userId);
+      
+      // Personne ne peut créer/modifier son propre rôle
+      allow create: if isAuthenticated() && 
+                       (!('role' in request.resource.data) || 
+                        request.resource.data.role == resource.data.role);
+      allow update: if isAuthenticated() && 
+                       (!('role' in request.resource.data) || 
+                        request.resource.data.role == resource.data.role);
+    }
+    
+    // Collection products
+    match /products/{productId} {
+      // Admin peut tout faire
+      allow read, write: if isAdmin();
+      
+      // Les utilisateurs peuvent lire les produits
+      allow read: if isAuthenticated();
+      
+      // Personne d'autre ne peut modifier
+      allow write: if false;
+    }
+    
+    // Collection sales
+    match /sales/{saleId} {
+      // Admin peut tout faire
+      allow read, write: if isAdmin();
+      
+      // Les utilisateurs peuvent créer des ventes
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Les utilisateurs peuvent lire leurs propres ventes
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Personne ne peut modifier ou supprimer les ventes (sauf admin)
+      allow update, delete: if false;
+    }
+    
+    // Collection settings (lecture seule pour tous)
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Collection categories
+    match /categories/{categoryId} {
+      // Admin peut tout faire
+      allow read, write: if isAdmin();
+      
+      // Les utilisateurs peuvent lire les catégories
+      allow read: if isAuthenticated();
+      
+      // Personne d'autre ne peut modifier
+      allow write: if false;
+    }
+  }
+}
+
